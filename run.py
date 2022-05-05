@@ -1,20 +1,29 @@
-import math
+from random import randint
 
 
 class GameArea:
     """
-    Constructs the game board, places battleships based on player input
-    and receives player name input.
+    Class container that onstructs the game board, places battleships based
+    on player input and receives player name input.
     """
     def __init__(self, size, num_ships, name):
-        self.boardsize = size
+        self.size = size
         self.num_ships = num_ships
         self.name = name
         self.comp_guess = []
         self.player_guess = []
         self.ships = []
 
-        print(size, num_ships, name)
+    def create_board(self, size):
+        """
+        Creates board for each player based on size input
+        """
+        board = []
+        i = 0
+        while i < size:
+            board.append(" - " * size)
+            i += 1
+        return board
 
 
 def new_game():
@@ -23,8 +32,9 @@ def new_game():
     based on inputs and prints input values.
     """
     name = input("Please enter your name: ")
-    print(f"Welcome aboard {name}.\n")
+    print(f"Welcome aboard, commander {name}.\n")
 
+    # sets board size based on user input
     while True:
         try:
             size = int(input("Select a board size between 5 & 10: "))
@@ -36,6 +46,7 @@ def new_game():
         except ValueError:
             print("Please enter a number between 5 & 10.\n")
 
+    # sets number of ships based on user input
     while True:
         try:
             num_ships = int(input("Choose a number of ships per player between"

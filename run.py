@@ -28,12 +28,13 @@ class GameArea:
         Place ships based on board size and number of ships selected.
         """
         ships_placed = 0
-        ship_coordinates = [x, y]
-        ship_placements = dict.fromkeys(ship_coordinates)
+        ship_placements = []
         while ships_placed < self.num_ships:
             ships_placed += 1
-            x_placement = randint(1, self.size)
-            y_placement = randint(1, self.size)
+            x = randint(1, self.size)
+            y = randint(1, self.size)
+            coordinates = x, y
+            ship_placements.append(coordinates)
         return ship_placements
 
 

@@ -14,16 +14,27 @@ class GameArea:
         self.player_guess = []
         self.ships = []
 
-    def create_board(self, size):
+    def create_board(self):
         """
         Creates board for each player based on size input
         """
-        board = []
         i = 0
-        while i < size:
-            board.append(" - " * size)
+        while i < self.size:
             i += 1
-        return board
+            return " - " * self.size
+
+    def place_ships(self):
+        """
+        Place ships based on board size and number of ships selected.
+        """
+        ships_placed = 0
+        ship_coordinates = [x, y]
+        ship_placements = dict.fromkeys(ship_coordinates)
+        while ships_placed < self.num_ships:
+            ships_placed += 1
+            x_placement = randint(1, self.size)
+            y_placement = randint(1, self.size)
+        return ship_placements
 
 
 def new_game():
@@ -59,7 +70,8 @@ def new_game():
         except ValueError:
             print("Please enter a number between 1 & 10.\n")
 
-    GameArea(size, num_ships, name)
+    player = GameArea(size, num_ships, name)
+    print(player.place_ships())
 
 
 new_game()

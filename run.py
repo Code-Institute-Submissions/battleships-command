@@ -19,9 +19,11 @@ class GameArea:
         Creates board for each player based on size input
         """
         i = 0
+        board = ""
         while i < self.size:
             i += 1
-            return " - " * self.size
+            board += (" - " * self.size + "\n")
+        return board
 
     def place_ships(self):
         """
@@ -33,7 +35,7 @@ class GameArea:
             ships_placed += 1
             x = randint(1, self.size)
             y = randint(1, self.size)
-            coordinates = x, y
+            coordinates = {x: y}
             ship_placements.append(coordinates)
         return ship_placements
 
@@ -50,7 +52,7 @@ def new_game():
     while True:
         try:
             size = int(input("Select a board size between 5 & 10: "))
-            if size not in range(5, 10):
+            if size not in range(5, 11):
                 print("Number must be between 5 & 10.\n")
             else:
                 print(f"You have chosen a board size of {size}\n")
@@ -63,7 +65,7 @@ def new_game():
         try:
             num_ships = int(input("Choose a number of ships per player between"
                                   " 1 & 10: "))
-            if num_ships not in range(1, 10):
+            if num_ships not in range(1, 11):
                 print("Please choose a number between 1 & 10.\n")
             else:
                 print(f"You have chosen {num_ships} ships per player.\n")
@@ -73,6 +75,7 @@ def new_game():
 
     player = GameArea(size, num_ships, name)
     print(player.place_ships())
+    print(player.create_board())
 
 
 new_game()

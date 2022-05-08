@@ -51,7 +51,6 @@ class GameArea:
                 x, y = coordinates[i]
                 board[x - 1] = board[x - 1][: (y - 1) * 3] + ' | ' + (
                     board[x - 1][y * 3:])
-        print(board)
         return board
 
 
@@ -90,11 +89,13 @@ def new_game():
 
     settings = GameArea(size, num_ships, name)
     computer_board = settings.create_board()
-    player_board = settings.create_board()
-    print("computer_board", computer_board, "player_board", player_board)
+    board = settings.create_board()
     player_coordinates = settings.create_coordinates()
-    print(player_coordinates)
-    tester = settings.ship_placements(player_board, player_coordinates)
+    player_board = settings.ship_placements(board, player_coordinates)
+    print(" Computer Board: ")
+    print(*computer_board, sep="\n")
+    print("\n Player Board: ")
+    print(*player_board, "\n", sep="\n")
 
 
 new_game()

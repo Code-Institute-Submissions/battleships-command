@@ -18,10 +18,10 @@ class GameArea:
         Creates board for each player based on size input
         """
         i = 0
-        board = ""
+        board = [""] * self.size
         while i < self.size:
+            board[i] = (" - " * self.size)
             i += 1
-            board += (" - " * self.size + "\n")
         return board
 
     def create_coordinates(self):
@@ -44,25 +44,15 @@ class GameArea:
         Places ships on the board based on num_ships selected and board,
         coordinates arguements.
         """
-        rows = board.count("\n")
         ships_placed = 0
         while ships_placed < self.num_ships:
             for i in range(self.num_ships):
                 ships_placed += 1
-                x = coordinates[i].index('x', 0)
-                y = coordinates[i].get("y", 0)
-                rows[y].index[x](" - ").replace(" | ")
-        print(coordinates)
+                x, y = coordinates[i]
+                board[x - 1] = board[x - 1][: (y - 1) * 3] + ' | ' + (
+                    board[x - 1][y * 3:])
+        print(board)
         return board
-
-
-class Player(GameArea):
-    """
-    Subclass for player guesses and ship coordinates.
-    """
-    def __init__(self, player_guess, player_ships):
-        self.player_guess = player_guess
-        self.player_ships = player_ships
 
 
 def new_game():
@@ -99,11 +89,12 @@ def new_game():
             print("Please enter a number between 1 & 10.\n")
 
     settings = GameArea(size, num_ships, name)
-    computer_board = f" Computer's Board: \n{settings.create_board()}"
-    player_board = f"Player's Board: \n{settings.create_board()}"
-    print(computer_board, player_board)
-    player_coordinates = list(settings.create_coordinates())
-    tester = settings.ship_placements([player_board], player_coordinates)
+    computer_board = settings.create_board()
+    player_board = settings.create_board()
+    print("computer_board", computer_board, "player_board", player_board)
+    player_coordinates = settings.create_coordinates()
+    print(player_coordinates)
+    tester = settings.ship_placements(player_board, player_coordinates)
 
 
 new_game()

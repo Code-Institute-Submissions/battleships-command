@@ -31,6 +31,7 @@ class GameArea:
         """
         coordinates_created = 0
         ship_coordinates = []
+        ship_coordinates.clear()
         while coordinates_created < self.num_ships:
             coordinates_created += 1
             x = randint(1, self.size)
@@ -87,15 +88,31 @@ def new_game():
         except ValueError:
             print("Please enter a number between 1 & 10.\n")
 
+    generate_boards(size, num_ships, name)
+
+
+def generate_boards(size, num_ships, name):
+    """
+    Generates player and computer boards and updates each board with new
+    values.
+    """
     settings = GameArea(size, num_ships, name)
-    computer_board = settings.create_board()
-    board = settings.create_board()
-    player_coordinates = settings.create_coordinates()
-    player_board = settings.ship_placements(board, player_coordinates)
-    print(" Computer Board: ")
-    print(*computer_board, sep="\n")
-    print("\n Player Board: ")
-    print(*player_board, "\n", sep="\n")
+
+    def create_board_settings():
+        """
+        Creates new board and generates ship coordinates based on input.
+        """
+        board = settings.create_board()
+        coordinates = settings.create_coordinates()
+        start = settings.ship_placements(board, coordinates)
+        return start
+
+    computer_start = create_board_settings()
+    print(" Computer's Board: ")
+    print(*computer_start, sep="\n")
+    player_start = create_board_settings()
+    print(f"\n {name.capitalize()}'s Board: ")
+    print(*player_start, "\n", sep="\n")
 
 
 new_game()

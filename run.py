@@ -29,15 +29,31 @@ class GameArea:
         Create coordinates for each ship based on board size and num_ships
         chosen.
         """
-        ships_placed = 0
-        ship_placements = []
-        while ships_placed < self.num_ships:
-            ships_placed += 1
+        coordinates_created = 0
+        ship_coordinates = []
+        while coordinates_created < self.num_ships:
+            coordinates_created += 1
             x = randint(1, self.size)
             y = randint(1, self.size)
-            coordinates = {x: y}
-            ship_placements.append(coordinates)
-        return ship_placements
+            coordinates = x, y
+            ship_coordinates.append(coordinates)
+        return ship_coordinates
+
+    def ship_placements(self, board, coordinates):
+        """
+        Places ships on the board based on num_ships selected and board,
+        coordinates arguements.
+        """
+        rows = board.count("\n")
+        ships_placed = 0
+        while ships_placed < self.num_ships:
+            for i in range(self.num_ships):
+                ships_placed += 1
+                x = coordinates[i].index('x', 0)
+                y = coordinates[i].get("y", 0)
+                rows[y].index[x](" - ").replace(" | ")
+        print(coordinates)
+        return board
 
 
 class Player(GameArea):
@@ -83,9 +99,11 @@ def new_game():
             print("Please enter a number between 1 & 10.\n")
 
     settings = GameArea(size, num_ships, name)
-    computer_board = f"Computer's Board: \n{settings.create_board()}"
+    computer_board = f" Computer's Board: \n{settings.create_board()}"
     player_board = f"Player's Board: \n{settings.create_board()}"
     print(computer_board, player_board)
+    player_coordinates = list(settings.create_coordinates())
+    tester = settings.ship_placements([player_board], player_coordinates)
 
 
 new_game()

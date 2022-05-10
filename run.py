@@ -96,14 +96,21 @@ def generate_boards(size, num_ships, name):
     Generates player and computer boards and updates each board with new
     values.
     """
+    print(size)
     settings = GameArea(size, num_ships, name)
+    total_coordinates = []
+    # player_coordinates = total_coordinates[0]
+    # computer_coordinates = total_coordinates[-1]
 
     def create_board_settings():
         """
         Creates new board and generates ship coordinates based on input.
         """
+        nonlocal total_coordinates
+
         board = settings.create_board()
         coordinates = settings.create_coordinates()
+        total_coordinates.append(coordinates)
         start = settings.ship_placements(board, coordinates)
         return start
 

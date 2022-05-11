@@ -1,5 +1,5 @@
 from random import randint
-import keyboard
+# import keyboard
 
 score = {"Player Ships": 0, "Computer Ships": 0}
 
@@ -13,6 +13,8 @@ class GameArea:
         self.size = size
         self.num_ships = num_ships
         self.name = name
+        self.player_guesses = []
+        self.computer_guesses = []
 
     def create_board(self):
         """
@@ -46,13 +48,10 @@ class GameArea:
         Places ships on the board based on num_ships selected and board,
         coordinates arguements.
         """
-        ships_placed = 0
-        while ships_placed < self.num_ships:
-            for i in range(self.num_ships):
-                ships_placed += 1
-                x, y = coordinates[i]
-                board[x - 1] = board[x - 1][: (y - 1) * 3] + ' | ' + (
-                    board[x - 1][y * 3:])
+        for i in range(self.num_ships):
+            x, y = coordinates[i]
+            board[x - 1] = board[x - 1][: (y - 1) * 3] + ' | ' + (
+                board[x - 1][y * 3:])
         return board
 
 
@@ -68,7 +67,7 @@ def new_game():
     while True:
         try:
             size = int(input("Select a board size between 5 & 10: "))
-            if size not in range(5, 11):
+            if size not in range(6, 11):
                 print("Number must be between 5 & 10.\n")
             else:
                 print(f"You have chosen a board size of {size}\n")
@@ -89,26 +88,37 @@ def new_game():
         except ValueError:
             print("Please enter a number between 1 & 10.\n")
 
-    generate_boards(size, num_ships, name)
-
-
-def generate_boards(size, num_ships, name):
-    """
-    Generates player and computer boards and updates each board with new
-    values.
-    """
     settings = GameArea(size, num_ships, name)
     board = settings.create_board()
     player_coordinates = settings.create_coordinates()
     computer_coordinates = settings.create_coordinates()
 
+    new_round(settings, board, player_coordinates, computer_coordinates)
+
+
+def generate_boards(name, computer_board, player_board, player_guesses,
+                    computer_guesses):
+    """
+    Generates player and computer boards and updates each board with new
+    values.
+    """
+    def update_board(board, guesses):
+        """
+        Updates board with guess coordinates for each player
+        """
+        for i in range(len(guesses)):
+            x, y = guesses[i]
+            board[x - 1] = board[x - 1][: (y - 1) * 3] + ' X ' + (
+                    board[x - 1][y * 3:])
+        return board
+
+    computer_board = update_board(computer_board, player_guesses)
+    player_board = update_board(player_board, computer_guesses)
+
     print(" Computer's Board: ")
-    print(computer_coordinates)
-    print(*board, sep="\n")
-    player_start = settings.ship_placements(board, player_coordinates)
+    print(*computer_board, sep="\n")
     print(f"\n {name.capitalize()}'s Board: ")
-    print(player_coordinates)
-    print(*player_start, "\n", sep="\n")
+    print(*player_board, "\n", sep="\n")
 
 
 def new_round(settings, board, player_coordinates, computer_coordinates):
@@ -116,26 +126,30 @@ def new_round(settings, board, player_coordinates, computer_coordinates):
     Confirms if player would like to continue playing, updates scores, boards
     player guesses, computer guesses and receives input for player guess.
     """
-    player_guesses = []
-    computer_guesses = []
-    player_ships = int(settings.num_ships)
-    computer_ships = int(settings.num_ships)
+    player_board = settings.ship_placements(board, player_coordinates)
+    computer_board = settings.create_board()
+    player_guesses = [(1, 3), (4, 6)]
+    computer_guesses = [(1, 3), (5, 7), (9, 5)]
+    player_ships = settings.num_ships
+    computer_ships = settings.num_ships
 
-    def continue_playing():
-        """
-        Confirms if the player would like to continue playing based on input
-        """
-        input("Press 'n' to stop playing or any other key to continue \n")
-        while True:
-            if keyboard.read_key() == "n":
-                print("Game over! \n")
-            else:
-                return
+    # def continue_playing():
+    #     """
+    #     Confirms if the player would like to continue playing based on input
+    #     """
+    #     input("Press 'n' to stop playing or any other key to continue \n")
+    #     while True:
+    #         if keyboard.read_key() == "n":
+    #             print("Game over! \n")
+    #         else:
+    #             return
 
-    if len(player_guesses) > 0:
-        continue_playing()
+    # # skips continue_playing for first round
+    # if len(player_guesses) > 0:
+    #     continue_playing()
 
-
+    generate_boards(settings.name, computer_board, player_board,
+                    player_guesses, computer_guesses)
 
 
 new_game()

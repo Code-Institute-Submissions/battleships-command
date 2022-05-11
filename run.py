@@ -1,5 +1,5 @@
 from random import randint
-# import keyboard
+import keyboard
 
 score = {"Player Ships": 0, "Computer Ships": 0}
 
@@ -106,8 +106,8 @@ def generate_boards(name, computer_board, player_board, player_guesses,
         """
         Updates board with guess coordinates for each player
         """
-        for i in range(len(guesses)):
-            x, y = guesses[i]
+        for i, guess in enumerate(guesses):
+            x, y = guess
             board[x - 1] = board[x - 1][: (y - 1) * 3] + ' X ' + (
                     board[x - 1][y * 3:])
         return board
@@ -128,25 +128,25 @@ def new_round(settings, board, player_coordinates, computer_coordinates):
     """
     player_board = settings.ship_placements(board, player_coordinates)
     computer_board = settings.create_board()
-    player_guesses = [(1, 3), (4, 6)]
-    computer_guesses = [(1, 3), (5, 7), (9, 5)]
+    player_guesses = []
+    computer_guesses = []
     player_ships = settings.num_ships
     computer_ships = settings.num_ships
 
-    # def continue_playing():
-    #     """
-    #     Confirms if the player would like to continue playing based on input
-    #     """
-    #     input("Press 'n' to stop playing or any other key to continue \n")
-    #     while True:
-    #         if keyboard.read_key() == "n":
-    #             print("Game over! \n")
-    #         else:
-    #             return
+    def continue_playing():
+        """
+        Confirms if the player would like to continue playing based on input
+        """
+        input("Press 'n' to stop playing or any other key to continue \n")
+        while True:
+            if keyboard.read_key() == "n":
+                print("Game over! \n")
+            else:
+                return
 
-    # # skips continue_playing for first round
-    # if len(player_guesses) > 0:
-    #     continue_playing()
+    # skips continue_playing for first round
+    if len(player_guesses) > 1:
+        continue_playing()
 
     generate_boards(settings.name, computer_board, player_board,
                     player_guesses, computer_guesses)

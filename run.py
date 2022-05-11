@@ -1,6 +1,7 @@
 from random import randint
+import keyboard
 
-score = {"Player Score": 0, "Computer Score": 0}
+score = {"Player Ships": 0, "Computer Ships": 0}
 
 
 class GameArea:
@@ -108,6 +109,33 @@ def generate_boards(size, num_ships, name):
     print(f"\n {name.capitalize()}'s Board: ")
     print(player_coordinates)
     print(*player_start, "\n", sep="\n")
+
+
+def new_round(settings, board, player_coordinates, computer_coordinates):
+    """
+    Confirms if player would like to continue playing, updates scores, boards
+    player guesses, computer guesses and receives input for player guess.
+    """
+    player_guesses = []
+    computer_guesses = []
+    player_ships = int(settings.num_ships)
+    computer_ships = int(settings.num_ships)
+
+    def continue_playing():
+        """
+        Confirms if the player would like to continue playing based on input
+        """
+        input("Press 'n' to stop playing or any other key to continue \n")
+        while True:
+            if keyboard.read_key() == "n":
+                print("Game over! \n")
+            else:
+                return
+
+    if len(player_guesses) > 0:
+        continue_playing()
+
+
 
 
 new_game()

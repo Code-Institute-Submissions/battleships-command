@@ -62,27 +62,27 @@ def new_game():
     # sets board size based on user input
     while True:
         try:
-            size = int(input("Select a board size between 5 & 10: "))
-            if size not in range(6, 11):
-                print("Number must be between 5 & 10.\n")
+            size = int(input("Select a board size between 5 and 10: "))
+            if size not in range(5, 11):
+                print("Number must be between 5 and 10.\n")
             else:
                 print(f"You have chosen a board size of {size}\n")
                 break
         except ValueError:
-            print("Please enter a number between 5 & 10.\n")
+            print("Please enter a number between 5 and 10.\n")
 
     # sets number of ships based on user input
     while True:
         try:
             num_ships = int(input("Choose a number of ships per player between"
-                                  " 1 & 10: "))
+                                  " 1 and 10: "))
             if num_ships not in range(1, 11):
-                print("Please choose a number between 1 & 10.\n")
+                print("Please choose a number between 1 and 10.\n")
             else:
                 print(f"You have chosen {num_ships} ships per player.\n")
                 break
         except ValueError:
-            print("Please enter a number between 1 & 10.\n")
+            print("Please enter a number between 1 and 10.\n")
 
     # creates variables from player input using GameArea class and methods
     settings = GameArea(size, num_ships, name)
@@ -117,7 +117,7 @@ def guesses_and_hits(board, guesses, hits):
     return board
 
 
-def generate_boards(name, computer_board, player_board):
+def generate_boards(name, computer_board, player_board, scores, guesses):
     """
     Generates player and computer boards with updated values.
     """
@@ -125,12 +125,13 @@ def generate_boards(name, computer_board, player_board):
     print(*computer_board, sep="\n")
     print(f"\n {name.capitalize()}'s Board: ")
     print(*player_board, "\n", sep="\n")
+    print(f"{scores}You have already guessed:\n{guesses}")
 
 
 def new_round(settings, player_board, computer_board, 
               player_coordinates, computer_coordinates):
     """
-    Stores game variables continue_playing function, calls updates_scores,
+    Stores game variables and continue_playing function, calls updates_scores,
     guesses_and_hits and new_guess functions.
     """
     # guess list variables
@@ -144,15 +145,43 @@ def new_round(settings, player_board, computer_board,
     # ship count and score variables
     player_ships = int(settings.num_ships)
     computer_ships = int(settings.num_ships)
-    score = f"""{settings.name}'s Ships: {player_ships}
-Computer's Ships: {computer_ships}"""
+    player_score = f"{settings.name}'s ships remaining: {player_ships}\n"
+    computer_score = f"Computer's ships remaining: {computer_ships}\n"
+    scores = player_score + computer_score
 
-    # updates computer and player boards then prints to terminal
+    # updates computer and player boards then calls generate_boards
     computer_board = guesses_and_hits(computer_board, player_guesses,
                                       player_hits)
     player_board = guesses_and_hits(player_board, computer_guesses,
                                     computer_hits)
-    generate_boards(settings.name, computer_board, player_board)
+    generate_boards(settings.name, computer_board, player_board, scores,
+                    player_guesses)
+
+    def new_guess(size, coordinates, guesses, player_type):
+        nonlocal player_guesses
+        nonlocal computer_guesses
+        if player_type == "player":
+            x = input(f"Select a row between 1 and {size}")
+            y = input(f"Select a column between 1 and {size}")
+            guess = x, y
+        else:
+            x = randint(1, size)
+            y = randint(1, size)
+            guess = x, y
+        confirm_hit(coordinates, guess, player_type)
+
+    def confirm_hit(coordinates, guess, player_type):
+        nonlocal player_hits
+        nonlocal computer_hits
+        nonlocal player_score
+        nonlocal computer_score
+        
+        for i in range(coordinates):
+            if guess == coordinates[i]:
+                if player_type == "player":
+
+
+
 
     def continue_playing():
         """

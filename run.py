@@ -1,7 +1,4 @@
 from random import randint
-import keyboard
-
-score = {"Player Ships": 0, "Computer Ships": 0}
 
 
 class GameArea:
@@ -92,64 +89,69 @@ def new_game():
     board = settings.create_board()
     player_coordinates = settings.create_coordinates()
     computer_coordinates = settings.create_coordinates()
+    player_board = settings.ship_placements(board, player_coordinates)
+    computer_board = settings.create_board()
 
-    new_round(settings, board, player_coordinates, computer_coordinates)
-
-
-def generate_boards(name, computer_board, player_board, player_guesses,
-                    computer_guesses):
-    """
-    Generates player and computer boards and updates each board with new
-    values.
-    """
-    def update_board(board, guesses):
-        """
-        Updates board with guess coordinates for each player
-        """
-        for i, guess in enumerate(guesses):
-            x, y = guess
-            board[x - 1] = board[x - 1][: (y - 1) * 3] + ' X ' + (
-                    board[x - 1][y * 3:])
-        return board
-
-    computer_board = update_board(computer_board, player_guesses)
-    player_board = update_board(player_board, computer_guesses)
-
-    print(" Computer's Board: ")
-    print(*computer_board, sep="\n")
-    print(f"\n {name.capitalize()}'s Board: ")
-    print(*player_board, "\n", sep="\n")
+    new_round(settings, player_board, computer_board,
+              player_coordinates, computer_coordinates)
 
 
-def new_round(settings, board, player_coordinates, computer_coordinates):
+def new_round(settings, player_board, computer_board, 
+              player_coordinates, computer_coordinates):
     """
     Confirms if player would like to continue playing, updates scores, boards
     player guesses, computer guesses and receives input for player guess.
     """
-    player_board = settings.ship_placements(board, player_coordinates)
-    computer_board = settings.create_board()
-    player_guesses = []
-    computer_guesses = []
-    player_ships = settings.num_ships
-    computer_ships = settings.num_ships
+    # guesses, hits and score variables
+    player_guesses = [(1, 7), (2, 5), (5, 9)]
+    computer_guesses = [(1, 7), (2, 5)]
+    player_hits = []
+    computer_hits = []
+    player_ships = int(settings.num_ships)
+    computer_ships = int(settings.num_ships)
+    score = f"""{settings.name.capitalize()}'s Ships: {player_ships}
+Computer's Ships: {computer_ships}"""
+    print(score)
 
     def continue_playing():
         """
-        Confirms if the player would like to continue playing based on input
+        Confirms if the player would like to continue playing based on input.
         """
-        input("Press 'n' to stop playing or any other key to continue \n")
+        resume = input("Press 'n' to quit or any other key to continue \n")
         while True:
-            if keyboard.read_key() == "n":
+            if resume == "n":
                 print("Game over! \n")
+                new_game()
             else:
                 return
 
-    # skips continue_playing for first round
-    if len(player_guesses) > 1:
-        continue_playing()
+    def update_board(board, guesses, hit_type):
+        """
+        Updates board with guess coordinates for each player.
+        """
+        for _, guess in enumerate(guesses):
+            x, y = guess
+            board[x - 1] = board[x - 1][: (y - 1) * 3] + f' {hit_type} ' + (
+                    board[x - 1][y * 3:])
+        return board
 
-    generate_boards(settings.name, computer_board, player_board,
-                    player_guesses, computer_guesses)
+    computer_board = update_board(computer_board, player_guesses, "X")
+    player_board = update_board(player_board, computer_guesses, "X")
+
+    def generate_boards(name, computer_board, player_board):
+        """
+        Generates player and computer boards with updated values.
+        """
+        print(" Computer's Board: ")
+        print(*computer_board, sep="\n")
+        print(f"\n {name.capitalize()}'s Board: ")
+        print(*player_board, "\n", sep="\n")
+
+    generate_boards(settings.name, computer_board, player_board)
+
+    # skips continue_playing for first round
+    if len(player_guesses) > 0:
+        continue_playing()
 
 
 new_game()

@@ -58,6 +58,7 @@ def new_game():
     based on inputs and prints input values.
     """
     name = input("Please enter your name: ")
+    name = name.capitalize()
     print(f"Welcome aboard, commander {name}.\n")
 
     # sets board size based on user input
@@ -85,6 +86,7 @@ def new_game():
         except ValueError:
             print("Please enter a number between 1 & 10.\n")
 
+    # creates variables from player input using GameArea class
     settings = GameArea(size, num_ships, name)
     board = settings.create_board()
     player_coordinates = settings.create_coordinates()
@@ -92,8 +94,20 @@ def new_game():
     player_board = settings.ship_placements(board, player_coordinates)
     computer_board = settings.create_board()
 
+    # calls new_round function with created variable values
     new_round(settings, player_board, computer_board,
               player_coordinates, computer_coordinates)
+
+
+def update_board(board, guesses, hit_type):
+    """
+    Updates board with guess coordinates for each player.
+    """
+    for _, guess in enumerate(guesses):
+        x, y = guess
+        board[x - 1] = board[x - 1][: (y - 1) * 3] + f' {hit_type} ' + (
+                board[x - 1][y * 3:])
+    return board
 
 
 def new_round(settings, player_board, computer_board, 
@@ -103,13 +117,13 @@ def new_round(settings, player_board, computer_board,
     player guesses, computer guesses and receives input for player guess.
     """
     # guesses, hits and score variables
-    player_guesses = [(1, 7), (2, 5), (5, 9)]
-    computer_guesses = [(1, 7), (2, 5)]
+    player_guesses = []
+    computer_guesses = []
     player_hits = []
     computer_hits = []
     player_ships = int(settings.num_ships)
     computer_ships = int(settings.num_ships)
-    score = f"""{settings.name.capitalize()}'s Ships: {player_ships}
+    score = f"""{settings.name}'s Ships: {player_ships}
 Computer's Ships: {computer_ships}"""
     print(score)
 
@@ -117,7 +131,7 @@ Computer's Ships: {computer_ships}"""
         """
         Confirms if the player would like to continue playing based on input.
         """
-        resume = input("Press 'n' to quit or any other key to continue \n")
+        resume = input("Enter 'n' to quit or any other key to continue \n")
         while True:
             if resume == "n":
                 print("Game over! \n")
@@ -125,18 +139,15 @@ Computer's Ships: {computer_ships}"""
             else:
                 return
 
-    def update_board(board, guesses, hit_type):
-        """
-        Updates board with guess coordinates for each player.
-        """
-        for _, guess in enumerate(guesses):
-            x, y = guess
-            board[x - 1] = board[x - 1][: (y - 1) * 3] + f' {hit_type} ' + (
-                    board[x - 1][y * 3:])
+    def guesses_and_hits(board, guesses, hits):
+        update_board(board, guesses, "X")
+        update_board(board, hits, "O")
         return board
 
-    computer_board = update_board(computer_board, player_guesses, "X")
-    player_board = update_board(player_board, computer_guesses, "X")
+    computer_board = guesses_and_hits(computer_board, player_guesses,
+                                      player_hits)
+    player_board = guesses_and_hits(player_board, computer_guesses,
+                                    computer_hits)
 
     def generate_boards(name, computer_board, player_board):
         """

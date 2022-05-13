@@ -125,7 +125,79 @@ def generate_boards(name, computer_board, player_board, scores, guesses):
     print(*computer_board, sep="\n")
     print(f"\n {name.capitalize()}'s Board: ")
     print(*player_board, "\n", sep="\n")
-    print(f"{scores}You have already guessed:\n{guesses}")
+
+    if len(guesses) > 0:
+        print(f"{scores}You have already guessed:\n{guesses}\n")
+
+
+def continue_playing():
+    """
+    Confirms if the player would like to continue playing based on input.
+    """
+    resume = input("Enter 'n' to quit or any other key to continue: ")
+    while True:
+        if resume == "n":
+            print("Game over! \n")
+            new_game()
+        else:
+            return
+
+
+def new_guess(size, guesses, player_type):
+    """
+    Takes input for new player guess or randomly generates new computer
+    guess then calls confirm_hit with guess created
+    """
+    def player_guess(guesses):
+        """
+        Takes input for guess and repeats if guess is a duplicate
+        """
+        while True:
+            try:
+                x = int(input(f"Select a row between 1 and {size}: "))
+                if x not in range(1, size + 1):
+                    print(f"Please pick a number between 1 and {size}.")
+                else:
+                    break
+            except ValueError:
+                print(f"Please choose a number between 1 and {size}.")
+        while True:
+            try:
+                y = int(input(f"Select a column between 1 and {size}: "))
+                if y not in range(1, size + 1):
+                    print(f"Please pick a number between 1 and {size}.")
+                else:
+                    break
+            except ValueError:
+                print(f"Please choose a number between 1 and {size}.")
+        guess = x, y
+
+        if guess in guesses:
+            print(f"You have already guessed {guess}! Please pick again.")
+            player_guess(guesses)
+        else:
+            print(f"You guessed: {guess}\n")
+            return guess
+
+    def computer_guess(guesses):
+        """
+        Generates guess with randint and repeats if guess is a duplicate
+        """
+        x = randint(1, size)
+        y = randint(1, size)
+        guess = x, y
+
+        if guess in guesses:
+            computer_guess(guesses)
+        else:
+            return guess
+
+    if player_type == "player":
+        guess = player_guess(guesses)
+    else:
+        guess = computer_guess(guesses)
+
+    return guess
 
 
 def new_round(settings, player_board, computer_board, 
@@ -142,103 +214,59 @@ def new_round(settings, player_board, computer_board,
     player_hits = []
     computer_hits = []
 
-    # ship count and score variables
+    # ships count and score variables
     player_ships = int(settings.num_ships)
     computer_ships = int(settings.num_ships)
     player_score = f"{settings.name}'s ships remaining: {player_ships}\n"
     computer_score = f"Computer's ships remaining: {computer_ships}\n"
     scores = player_score + computer_score
 
-    def new_guess(size, coordinates, guesses, player_type):
-        """
-        Takes input for new player guess or randomly generates new computer
-        guess then calls confirm_hit with guess created
-        """
-        nonlocal player_guesses
-        nonlocal computer_guesses
-
-        def player_guess(guesses):
-            while True:
-                try:
-                    x = input(f"Select a row between 1 and {size}: ")
-                    if x not in range(1, size + 1):
-                        print(f"Please pick a number between 1 and {size}.")
-                    else:
-                        break
-                except ValueError:
-                    print(f"Please choose a number between 1 and {size}.")
-                try:
-                    y = input(f"Select a column between 1 and {size}: ")
-                    if y not in range(1, size + 1):
-                        print(f"Please pick a number between 1 and {size}.")
-                    else:
-                        break
-                except ValueError:
-                    print(f"Please choose a number between 1 and {size}.")
-            guess = x, y
-
-            if guess in guesses:
-                print(f"You have already guessed {guess}! Please pick again.")
-                player_guess(guesses)
-            else:
-                print(f"You guessed: {guess}")
-                player_guesses.append(guess)
-                return guess
-
-        def computer_guess(guesses):
-            x = randint(1, size)
-            y = randint(1, size)
-            guess = x, y
-
-            if guess in guesses:
-                computer_guess(guesses)
-            else:
-                computer_guesses.append(guess)
-                return guess
-
-        if player_type == "player":
-            guess = player_guess(guesses)
-        else:
-            guess = computer_guess(guesses)
-
-        confirm_hit(coordinates, guess, player_type)
-
     def confirm_hit(coordinates, guess, player_type):
         """
         Checks if guess matches coordinates for player_type then appends
-        player_lists or computer_hits, updates player or computer score or
+        guess and hit lists, updates player or computer score or
         returns nothing.
         """
         nonlocal player_hits
         nonlocal computer_hits
-        nonlocal player_score
-        nonlocal computer_score
+        nonlocal player_ships
+        nonlocal computer_ships
+        nonlocal player_guesses
+        nonlocal computer_guesses
 
-        for i in range(coordinates):
-            if guess == coordinates[i]:
+        for i, _ in enumerate(coordinates):
+            if guess in coordinates[i]:
                 if player_type == "player":
                     player_hits.append(guess)
-                    computer_score -= 1
+                    computer_ships -= 1
                     print("You sunk a battleship!")
                 else:
                     computer_hits.append(guess)
-                    player_score -= 1
+                    player_ships -= 1
                     print("The enemy sunk a battleship!")
             else:
-                print("No ships were hit this round.")
+                if player_type == "player":
+                    player_guesses.append(guess)
+                else:
+                    computer_guesses.append(guess)
                 return
 
-    def continue_playing():
-        """
-        Confirms if the player would like to continue playing based on input.
-        """
-        resume = input("Enter 'n' to quit or any other key to continue: ")
-        while True:
-            if resume == "n":
-                print("Game over! \n")
-                new_game()
-            else:
-                return
+    # skips continue_playing for first round
+    if len(player_guesses) > 0:
+        continue_playing()
+
+    # prints board before first round input requested
+    if len(player_guesses) == 0:
+        generate_boards(settings.name, computer_board, player_board, scores,
+                        player_guesses)
+
+    # calls new_guess function for player and computer
+    player_pick = new_guess(settings.size, player_guesses, "player")
+    computer_pick = new_guess(settings.size, computer_guesses, "computer")
+
+    # calls confirm_hit for player and computer
+    confirm_hit(computer_coordinates, player_pick, "player")
+    confirm_hit(player_coordinates, computer_pick, "computer")
 
     # updates computer and player boards then calls generate_boards
     computer_board = guesses_and_hits(computer_board, player_guesses,
@@ -247,10 +275,6 @@ def new_round(settings, player_board, computer_board,
                                     computer_hits)
     generate_boards(settings.name, computer_board, player_board, scores,
                     player_guesses)
-
-    # skips continue_playing for first round
-    if len(player_guesses) > 0:
-        continue_playing()
 
 
 new_game()

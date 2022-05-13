@@ -149,39 +149,84 @@ def new_round(settings, player_board, computer_board,
     computer_score = f"Computer's ships remaining: {computer_ships}\n"
     scores = player_score + computer_score
 
-    # updates computer and player boards then calls generate_boards
-    computer_board = guesses_and_hits(computer_board, player_guesses,
-                                      player_hits)
-    player_board = guesses_and_hits(player_board, computer_guesses,
-                                    computer_hits)
-    generate_boards(settings.name, computer_board, player_board, scores,
-                    player_guesses)
-
     def new_guess(size, coordinates, guesses, player_type):
+        """
+        Takes input for new player guess or randomly generates new computer
+        guess then calls confirm_hit with guess created
+        """
         nonlocal player_guesses
         nonlocal computer_guesses
-        if player_type == "player":
-            x = input(f"Select a row between 1 and {size}")
-            y = input(f"Select a column between 1 and {size}")
+
+        def player_guess(guesses):
+            while True:
+                try:
+                    x = input(f"Select a row between 1 and {size}: ")
+                    if x not in range(1, size + 1):
+                        print(f"Please pick a number between 1 and {size}.")
+                    else:
+                        break
+                except ValueError:
+                    print(f"Please choose a number between 1 and {size}.")
+                try:
+                    y = input(f"Select a column between 1 and {size}: ")
+                    if y not in range(1, size + 1):
+                        print(f"Please pick a number between 1 and {size}.")
+                    else:
+                        break
+                except ValueError:
+                    print(f"Please choose a number between 1 and {size}.")
             guess = x, y
-        else:
+
+            if guess in guesses:
+                print(f"You have already guessed {guess}! Please pick again.")
+                player_guess(guesses)
+            else:
+                print(f"You guessed: {guess}")
+                player_guesses.append(guess)
+                return guess
+
+        def computer_guess(guesses):
             x = randint(1, size)
             y = randint(1, size)
             guess = x, y
+
+            if guess in guesses:
+                computer_guess(guesses)
+            else:
+                computer_guesses.append(guess)
+                return guess
+
+        if player_type == "player":
+            guess = player_guess(guesses)
+        else:
+            guess = computer_guess(guesses)
+
         confirm_hit(coordinates, guess, player_type)
 
     def confirm_hit(coordinates, guess, player_type):
+        """
+        Checks if guess matches coordinates for player_type then appends
+        player_lists or computer_hits, updates player or computer score or
+        returns nothing.
+        """
         nonlocal player_hits
         nonlocal computer_hits
         nonlocal player_score
         nonlocal computer_score
-        
+
         for i in range(coordinates):
             if guess == coordinates[i]:
                 if player_type == "player":
-
-
-
+                    player_hits.append(guess)
+                    computer_score -= 1
+                    print("You sunk a battleship!")
+                else:
+                    computer_hits.append(guess)
+                    player_score -= 1
+                    print("The enemy sunk a battleship!")
+            else:
+                print("No ships were hit this round.")
+                return
 
     def continue_playing():
         """
@@ -194,6 +239,14 @@ def new_round(settings, player_board, computer_board,
                 new_game()
             else:
                 return
+
+    # updates computer and player boards then calls generate_boards
+    computer_board = guesses_and_hits(computer_board, player_guesses,
+                                      player_hits)
+    player_board = guesses_and_hits(player_board, computer_guesses,
+                                    computer_hits)
+    generate_boards(settings.name, computer_board, player_board, scores,
+                    player_guesses)
 
     # skips continue_playing for first round
     if len(player_guesses) > 0:

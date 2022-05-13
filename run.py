@@ -10,8 +10,6 @@ class GameArea:
         self.size = size
         self.num_ships = num_ships
         self.name = name
-        self.player_guesses = []
-        self.computer_guesses = []
 
     def create_board(self):
         """
@@ -86,7 +84,7 @@ def new_game():
         except ValueError:
             print("Please enter a number between 1 & 10.\n")
 
-    # creates variables from player input using GameArea class
+    # creates variables from player input using GameArea class and methods
     settings = GameArea(size, num_ships, name)
     board = settings.create_board()
     player_coordinates = settings.create_coordinates()
@@ -110,55 +108,63 @@ def update_board(board, guesses, hit_type):
     return board
 
 
+def guesses_and_hits(board, guesses, hits):
+    """
+    Calls update_board with guesses and hits then returns updated board
+    """
+    update_board(board, guesses, "X")
+    update_board(board, hits, "O")
+    return board
+
+
+def generate_boards(name, computer_board, player_board):
+    """
+    Generates player and computer boards with updated values.
+    """
+    print(" Computer's Board: ")
+    print(*computer_board, sep="\n")
+    print(f"\n {name.capitalize()}'s Board: ")
+    print(*player_board, "\n", sep="\n")
+
+
 def new_round(settings, player_board, computer_board, 
               player_coordinates, computer_coordinates):
     """
-    Confirms if player would like to continue playing, updates scores, boards
-    player guesses, computer guesses and receives input for player guess.
+    Stores game variables continue_playing function, calls updates_scores,
+    guesses_and_hits and new_guess functions.
     """
-    # guesses, hits and score variables
+    # guess list variables
     player_guesses = []
     computer_guesses = []
+
+    # hit list variables
     player_hits = []
     computer_hits = []
+
+    # ship count and score variables
     player_ships = int(settings.num_ships)
     computer_ships = int(settings.num_ships)
     score = f"""{settings.name}'s Ships: {player_ships}
 Computer's Ships: {computer_ships}"""
-    print(score)
+
+    # updates computer and player boards then prints to terminal
+    computer_board = guesses_and_hits(computer_board, player_guesses,
+                                      player_hits)
+    player_board = guesses_and_hits(player_board, computer_guesses,
+                                    computer_hits)
+    generate_boards(settings.name, computer_board, player_board)
 
     def continue_playing():
         """
         Confirms if the player would like to continue playing based on input.
         """
-        resume = input("Enter 'n' to quit or any other key to continue \n")
+        resume = input("Enter 'n' to quit or any other key to continue: ")
         while True:
             if resume == "n":
                 print("Game over! \n")
                 new_game()
             else:
                 return
-
-    def guesses_and_hits(board, guesses, hits):
-        update_board(board, guesses, "X")
-        update_board(board, hits, "O")
-        return board
-
-    computer_board = guesses_and_hits(computer_board, player_guesses,
-                                      player_hits)
-    player_board = guesses_and_hits(player_board, computer_guesses,
-                                    computer_hits)
-
-    def generate_boards(name, computer_board, player_board):
-        """
-        Generates player and computer boards with updated values.
-        """
-        print(" Computer's Board: ")
-        print(*computer_board, sep="\n")
-        print(f"\n {name.capitalize()}'s Board: ")
-        print(*player_board, "\n", sep="\n")
-
-    generate_boards(settings.name, computer_board, player_board)
 
     # skips continue_playing for first round
     if len(player_guesses) > 0:

@@ -10,6 +10,12 @@ class GameArea:
         self.size = size
         self.num_ships = num_ships
         self.name = name
+        self.player_hits = []
+        self.computer_hits = []
+        self.player_ships = num_ships
+        self.computer_ships = num_ships
+        self.player_guesses = []
+        self.computer_guesses = []
 
     def create_board(self):
         """
@@ -48,6 +54,29 @@ class GameArea:
             board[x - 1] = board[x - 1][: (y - 1) * 3] + ' | ' + (
                 board[x - 1][y * 3:])
         return board
+
+    def confirm_hit(self, coordinates, guess, player_type):
+        """
+        Checks if guess matches coordinates for player_type then appends
+        guess and hit lists, updates player or computer score or
+        returns nothing.
+        """
+        for i, _ in enumerate(coordinates):
+            if guess in coordinates[i]:
+                if player_type == "player":
+                    self.player_hits.append(guess)
+                    self.computer_ships -= 1
+                    print("You sunk a battleship!")
+                else:
+                    self.computer_hits.append(guess)
+                    self.player_ships -= 1
+                    print("The enemy sunk a battleship!")
+            else:
+                if player_type == "player":
+                    self.player_guesses.append(guess)
+                else:
+                    self.computer_guesses.append(guess)
+                return
 
 
 def new_game():
@@ -119,7 +148,7 @@ def guesses_and_hits(board, guesses, hits):
 
 def generate_boards(name, computer_board, player_board, scores, guesses):
     """
-    Generates player and computer boards with updated values.
+    Prints player and computer boards with updated values.
     """
     print(" Computer's Board: ")
     print(*computer_board, sep="\n")
@@ -170,13 +199,14 @@ def new_guess(size, guesses, player_type):
                     break
             except ValueError:
                 print(f"Please choose a number between 1 and {size}.")
-        guess = x, y
+        pick = x, y
 
-        if guess in guesses:
-            print(f"You have already guessed {guess}! Please pick again.")
+        if pick in guesses:
+            print(f"You have already guessed {pick}! Please pick again.")
             player_guess(guesses)
         else:
-            print(f"You guessed: {guess}\n")
+            print(f"You guessed: {pick}\n")
+            guess = pick
             return guess
 
     def computer_guess(guesses):
@@ -185,96 +215,60 @@ def new_guess(size, guesses, player_type):
         """
         x = randint(1, size)
         y = randint(1, size)
-        guess = x, y
+        pick = x, y
 
-        if guess in guesses:
+        if pick in guesses:
             computer_guess(guesses)
         else:
+            guess = pick
             return guess
 
     if player_type == "player":
         guess = player_guess(guesses)
     else:
         guess = computer_guess(guesses)
-
     return guess
 
 
-def new_round(settings, player_board, computer_board, 
+def new_round(settings, player_board, computer_board,
               player_coordinates, computer_coordinates):
     """
     Stores game variables and continue_playing function, calls updates_scores,
     guesses_and_hits and new_guess functions.
     """
-    # guess list variables
-    player_guesses = []
-    computer_guesses = []
-
-    # hit list variables
-    player_hits = []
-    computer_hits = []
-
-    # ships count and score variables
-    player_ships = int(settings.num_ships)
-    computer_ships = int(settings.num_ships)
-    player_score = f"{settings.name}'s ships remaining: {player_ships}\n"
-    computer_score = f"Computer's ships remaining: {computer_ships}\n"
-    scores = player_score + computer_score
-
-    def confirm_hit(coordinates, guess, player_type):
-        """
-        Checks if guess matches coordinates for player_type then appends
-        guess and hit lists, updates player or computer score or
-        returns nothing.
-        """
-        nonlocal player_hits
-        nonlocal computer_hits
-        nonlocal player_ships
-        nonlocal computer_ships
-        nonlocal player_guesses
-        nonlocal computer_guesses
-
-        for i, _ in enumerate(coordinates):
-            if guess in coordinates[i]:
-                if player_type == "player":
-                    player_hits.append(guess)
-                    computer_ships -= 1
-                    print("You sunk a battleship!")
-                else:
-                    computer_hits.append(guess)
-                    player_ships -= 1
-                    print("The enemy sunk a battleship!")
-            else:
-                if player_type == "player":
-                    player_guesses.append(guess)
-                else:
-                    computer_guesses.append(guess)
-                return
+    p_score = f"{settings.name}'s ships remaining: {settings.player_ships}\n"
+    c_score = f"Computer's ships remaining: {settings.computer_ships}\n"
+    scores = p_score + c_score
 
     # skips continue_playing for first round
-    if len(player_guesses) > 0:
+    if len(settings.player_guesses) > 0:
         continue_playing()
 
     # prints board before first round input requested
-    if len(player_guesses) == 0:
+    if len(settings.player_guesses) == 0:
         generate_boards(settings.name, computer_board, player_board, scores,
-                        player_guesses)
+                        settings.player_guesses)
 
     # calls new_guess function for player and computer
-    player_pick = new_guess(settings.size, player_guesses, "player")
-    computer_pick = new_guess(settings.size, computer_guesses, "computer")
+    player_pick = new_guess(settings.size, settings.player_guesses, "player")
+    computer_pick = new_guess(settings.size, settings.computer_guesses,
+                              "computer")
 
     # calls confirm_hit for player and computer
-    confirm_hit(computer_coordinates, player_pick, "player")
-    confirm_hit(player_coordinates, computer_pick, "computer")
+    settings.confirm_hit(computer_coordinates, player_pick, "player")
+    settings.confirm_hit(player_coordinates, computer_pick, "computer")
 
     # updates computer and player boards then calls generate_boards
-    computer_board = guesses_and_hits(computer_board, player_guesses,
-                                      player_hits)
-    player_board = guesses_and_hits(player_board, computer_guesses,
-                                    computer_hits)
+    computer_board = guesses_and_hits(computer_board, settings.player_guesses,
+                                      settings.player_hits)
+    player_board = guesses_and_hits(player_board, settings.computer_guesses,
+                                    settings.computer_hits)
     generate_boards(settings.name, computer_board, player_board, scores,
-                    player_guesses)
+                    settings.player_guesses)
+
+    # starts new_round function with updated data
+    new_round(settings, player_board, computer_board,
+              player_coordinates, computer_coordinates)
 
 
 new_game()

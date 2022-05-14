@@ -78,6 +78,19 @@ class GameArea:
                     self.player_ships -= 1
                     print("The enemy sunk a battleship!\n")
 
+    def game_over(self, trigger):
+        """
+        Prints message based on method trigger and clears GameArea lists.
+        """
+        if self.player_ships == 0 or trigger == "forfeit":
+            print(f"You lost! You sunk {len(self.player_hits)} ships.\n")
+        elif self.computer_ships == 0:
+            print(f"You won! You have {self.player_ships} ships remaining.\n")
+        self.player_guesses.clear()
+        self.computer_guesses.clear()
+        self.player_hits.clear()
+        self.computer_hits.clear()
+
 
 def new_game():
     """
@@ -155,19 +168,20 @@ def generate_boards(name, computer_board, player_board, scores, guesses):
     print(f"\n {name.capitalize()}'s Board: ")
     print(*player_board, "\n", sep="\n")
 
-    if len(guesses) > 0:
+    if len(guesses) == 0:
         print(f"{scores}You have already guessed:\n{guesses}\n")
+    else:
+        print(scores)
 
 
-def continue_playing():
+def continue_playing(settings):
     """
     Confirms if the player would like to continue playing based on input.
     """
     resume = input("Enter 'n' to quit or any other key to continue: ")
     while True:
         if resume == "n":
-            print("Game over! \n")
-            new_game()
+            settings.game_over("forfeit")
         else:
             return
 
@@ -203,10 +217,10 @@ def new_guess(size, guesses, player_type):
 
         if guess in guesses:
             print(f"You have already guessed {guess}! Please pick again.")
-            player_guess(guesses)
+            guess = None
         else:
             print(f"You guessed: {guess}\n")
-            return guess
+        return guess
 
     def computer_guess(guesses):
         """
@@ -217,14 +231,18 @@ def new_guess(size, guesses, player_type):
         guess = x, y
 
         if guess in guesses:
-            computer_guess(guesses)
-        else:
-            return guess
+            guess = None
+        return guess
 
+    # creates guess based on player_type and repeats if guess is duplicate
     if player_type == "player":
         guess = player_guess(guesses)
+        while guess is None:
+            guess = player_guess(guesses)
     else:
         guess = computer_guess(guesses)
+        while guess is None:
+            guess = computer_guess(guesses)
     return guess
 
 
@@ -234,12 +252,14 @@ def new_round(settings, player_board, computer_board,
     Stores game variables and continue_playing function, calls updates_scores,
     guesses_and_hits and new_guess functions.
     """
-    # print(player_coordinates, "\n", computer_coordinates)
-
     # updates scores
     p_score = f"{settings.name}'s ships remaining: {settings.player_ships}\n"
     c_score = f"Computer's ships remaining: {settings.computer_ships}\n"
     scores = p_score + c_score
+
+    # calls game_over if either player has 0 ships remaining
+    if settings.player_ships or settings.computer_ships == 0:
+        settings.game_over("loss")
 
     # prints game boards
     generate_boards(settings.name, computer_board, player_board, scores,
@@ -247,7 +267,7 @@ def new_round(settings, player_board, computer_board,
 
     # confirms if player will continue and skips function for first round
     if len(settings.player_guesses) > 0:
-        continue_playing()
+        continue_playing(settings)
 
     # calls new_guess function for player and computer
     player_pick = new_guess(settings.size, settings.player_guesses, "player")

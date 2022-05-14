@@ -6,6 +6,7 @@ class GameArea:
     Class container that constructs the game board, generates ship coordinates
     based on player input and receives player name input.
     """
+    # guess and hit list variables
     player_guesses = []
     computer_guesses = []
     player_hits = []
@@ -15,8 +16,8 @@ class GameArea:
         self.size = size
         self.num_ships = num_ships
         self.name = name
-        self.player_ships = num_ships
-        self.computer_ships = num_ships
+        self.player_ships = self.num_ships
+        self.computer_ships = self.num_ships
 
     def create_board(self):
         """
@@ -233,20 +234,20 @@ def new_round(settings, player_board, computer_board,
     Stores game variables and continue_playing function, calls updates_scores,
     guesses_and_hits and new_guess functions.
     """
+    # print(player_coordinates, "\n", computer_coordinates)
+
+    # updates scores
     p_score = f"{settings.name}'s ships remaining: {settings.player_ships}\n"
     c_score = f"Computer's ships remaining: {settings.computer_ships}\n"
     scores = p_score + c_score
 
-    print(player_coordinates, "\n", computer_coordinates)
+    # prints game boards
+    generate_boards(settings.name, computer_board, player_board, scores,
+                    settings.player_guesses)
 
-    # skips continue_playing for first round
+    # confirms if player will continue and skips function for first round
     if len(settings.player_guesses) > 0:
         continue_playing()
-
-    # prints board before first round input requested
-    if len(settings.player_guesses) == 0:
-        generate_boards(settings.name, computer_board, player_board, scores,
-                        settings.player_guesses)
 
     # calls new_guess function for player and computer
     player_pick = new_guess(settings.size, settings.player_guesses, "player")
@@ -257,15 +258,13 @@ def new_round(settings, player_board, computer_board,
     settings.confirm_hit(computer_coordinates, player_pick, "player")
     settings.confirm_hit(player_coordinates, computer_pick, "computer")
 
-    # updates computer and player boards then calls generate_boards
+    # updates computer and player boards with latest guesses
     computer_board = guesses_and_hits(computer_board, settings.player_guesses,
                                       settings.player_hits)
     player_board = guesses_and_hits(player_board, settings.computer_guesses,
                                     settings.computer_hits)
-    generate_boards(settings.name, computer_board, player_board, scores,
-                    settings.player_guesses)
 
-    # starts new_round function with updated data
+    # calls new_round function with updated data
     new_round(settings, player_board, computer_board,
               player_coordinates, computer_coordinates)
 

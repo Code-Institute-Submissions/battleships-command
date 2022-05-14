@@ -6,16 +6,17 @@ class GameArea:
     Class container that constructs the game board, generates ship coordinates
     based on player input and receives player name input.
     """
+    player_guesses = []
+    computer_guesses = []
+    player_hits = []
+    computer_hits = []
+
     def __init__(self, size, num_ships, name):
         self.size = size
         self.num_ships = num_ships
         self.name = name
-        self.player_hits = []
-        self.computer_hits = []
         self.player_ships = num_ships
         self.computer_ships = num_ships
-        self.player_guesses = []
-        self.computer_guesses = []
 
     def create_board(self):
         """
@@ -61,22 +62,20 @@ class GameArea:
         guess and hit lists, updates player or computer score or
         returns nothing.
         """
-        for i, _ in enumerate(coordinates):
-            if guess in coordinates[i]:
-                if player_type == "player":
+        if player_type == "player":
+            self.player_guesses.append(guess)
+            for i, _ in enumerate(coordinates):
+                if guess == coordinates[i]:
                     self.player_hits.append(guess)
                     self.computer_ships -= 1
-                    print("You sunk a battleship!")
-                else:
+                    print("You sunk a battleship!\n")
+        else:
+            self.computer_guesses.append(guess)
+            for i, _ in enumerate(coordinates):
+                if guess == coordinates[i]:
                     self.computer_hits.append(guess)
                     self.player_ships -= 1
-                    print("The enemy sunk a battleship!")
-            else:
-                if player_type == "player":
-                    self.player_guesses.append(guess)
-                else:
-                    self.computer_guesses.append(guess)
-                return
+                    print("The enemy sunk a battleship!\n")
 
 
 def new_game():
@@ -199,14 +198,13 @@ def new_guess(size, guesses, player_type):
                     break
             except ValueError:
                 print(f"Please choose a number between 1 and {size}.")
-        pick = x, y
+        guess = x, y
 
-        if pick in guesses:
-            print(f"You have already guessed {pick}! Please pick again.")
+        if guess in guesses:
+            print(f"You have already guessed {guess}! Please pick again.")
             player_guess(guesses)
         else:
-            print(f"You guessed: {pick}\n")
-            guess = pick
+            print(f"You guessed: {guess}\n")
             return guess
 
     def computer_guess(guesses):
@@ -215,12 +213,11 @@ def new_guess(size, guesses, player_type):
         """
         x = randint(1, size)
         y = randint(1, size)
-        pick = x, y
+        guess = x, y
 
-        if pick in guesses:
+        if guess in guesses:
             computer_guess(guesses)
         else:
-            guess = pick
             return guess
 
     if player_type == "player":
@@ -239,6 +236,8 @@ def new_round(settings, player_board, computer_board,
     p_score = f"{settings.name}'s ships remaining: {settings.player_ships}\n"
     c_score = f"Computer's ships remaining: {settings.computer_ships}\n"
     scores = p_score + c_score
+
+    print(player_coordinates, "\n", computer_coordinates)
 
     # skips continue_playing for first round
     if len(settings.player_guesses) > 0:

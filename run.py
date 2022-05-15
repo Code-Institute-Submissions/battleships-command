@@ -100,9 +100,15 @@ def new_game():
     Starts a new game instance. Sets player name, board size & number of ships
     based on inputs and prints input values.
     """
-    name = input("Please enter your name: ")
-    name = name.capitalize()
-    print(f"Welcome aboard, commander {name}.\n")
+    # takes input for player name
+    while True:
+        name = input("Please enter your name: ")
+        if len(name) == 0:
+            print("You must enter a name to proceed.")
+        else:
+            name = name.capitalize()
+            print(f"Welcome aboard, commander {name}.\n")
+            break
 
     # sets board size based on user input
     while True:
@@ -166,11 +172,13 @@ def generate_boards(name, computer_board, player_board, scores, guesses):
     """
     Prints player and computer boards with updated values.
     """
+    # seperate lists function credit in README
     print(" Computer's Board: ")
     print(*computer_board, sep="\n")
     print(f"\n {name.capitalize()}'s Board: ")
     print(*player_board, "\n", sep="\n")
 
+    # prints scores on first round then scores and guesses for future rounds
     if len(guesses) > 0:
         print(f"{scores}You have already guessed:\n{guesses}\n")
     else:
@@ -181,7 +189,7 @@ def continue_playing(settings):
     """
     Confirms if the player would like to continue playing based on input.
     """
-    resume = input("Enter 'n' to forfeit or any other key to continue: ")
+    resume = input("Enter 'n' to quit or any other key to continue: ")
     while True:
         if resume == "n":
             settings.game_over("forfeit")

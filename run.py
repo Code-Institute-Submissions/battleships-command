@@ -269,7 +269,9 @@ def new_round(settings, player_board, computer_board,
     scores = p_score + c_score
 
     # calls game_over if either player has 0 ships remaining
-    if (settings.player_ships or settings.computer_ships) == 0:
+    if settings.player_ships == 0:
+        settings.game_over("loss")
+    elif settings.computer_ships == 0:
         settings.game_over("loss")
 
     # prints game boards

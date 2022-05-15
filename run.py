@@ -4,7 +4,8 @@ from random import randint
 class GameArea:
     """
     Class container that constructs the game board, generates ship coordinates
-    based on player input and receives player name input.
+    based and player name based on input received and additionally holds
+    methods for confirming hits and ending the game.
     """
     # guess and hit list variables
     player_guesses = []
@@ -80,7 +81,8 @@ class GameArea:
 
     def game_over(self, trigger):
         """
-        Prints message based on method trigger and clears GameArea lists.
+        Prints message based on trigger argument and clears GameArea lists then
+        starts a new game.
         """
         if self.player_ships == 0 or trigger == "forfeit":
             print(f"You lost! You sunk {len(self.player_hits)} ships.\n")
@@ -90,6 +92,7 @@ class GameArea:
         self.computer_guesses.clear()
         self.player_hits.clear()
         self.computer_hits.clear()
+        new_game()
 
 
 def new_game():
@@ -168,7 +171,7 @@ def generate_boards(name, computer_board, player_board, scores, guesses):
     print(f"\n {name.capitalize()}'s Board: ")
     print(*player_board, "\n", sep="\n")
 
-    if len(guesses) == 0:
+    if len(guesses) > 0:
         print(f"{scores}You have already guessed:\n{guesses}\n")
     else:
         print(scores)
@@ -178,7 +181,7 @@ def continue_playing(settings):
     """
     Confirms if the player would like to continue playing based on input.
     """
-    resume = input("Enter 'n' to quit or any other key to continue: ")
+    resume = input("Enter 'n' to forfeit or any other key to continue: ")
     while True:
         if resume == "n":
             settings.game_over("forfeit")
@@ -258,7 +261,7 @@ def new_round(settings, player_board, computer_board,
     scores = p_score + c_score
 
     # calls game_over if either player has 0 ships remaining
-    if settings.player_ships or settings.computer_ships == 0:
+    if (settings.player_ships or settings.computer_ships) == 0:
         settings.game_over("loss")
 
     # prints game boards

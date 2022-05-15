@@ -185,18 +185,6 @@ def generate_boards(name, computer_board, player_board, scores, guesses):
         print(scores)
 
 
-def continue_playing(settings):
-    """
-    Confirms if the player would like to continue playing based on input.
-    """
-    resume = input("Enter 'n' to quit or any other key to continue: ")
-    while True:
-        if resume == "n":
-            settings.game_over("forfeit")
-        else:
-            return
-
-
 def new_guess(size, guesses, player_type):
     """
     Takes input for new player guess or randomly generates new computer
@@ -204,7 +192,7 @@ def new_guess(size, guesses, player_type):
     """
     def player_guess(guesses):
         """
-        Takes input for guess and repeats if guess is a duplicate
+        Takes player input for guess and repeats if guess is a duplicate
         """
         while True:
             try:
@@ -257,6 +245,18 @@ def new_guess(size, guesses, player_type):
     return guess
 
 
+def continue_playing(settings):
+    """
+    Confirms if the player would like to continue playing based on input.
+    """
+    resume = input("Enter 'n' to quit or any other key to continue: ")
+    while True:
+        if resume == "n":
+            settings.game_over("forfeit")
+        else:
+            return
+
+
 def new_round(settings, player_board, computer_board,
               player_coordinates, computer_coordinates):
     """
@@ -272,7 +272,7 @@ def new_round(settings, player_board, computer_board,
     if settings.player_ships == 0:
         settings.game_over("loss")
     elif settings.computer_ships == 0:
-        settings.game_over("loss")
+        settings.game_over("win")
 
     # prints game boards
     generate_boards(settings.name, computer_board, player_board, scores,

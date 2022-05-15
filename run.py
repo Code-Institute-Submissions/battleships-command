@@ -100,6 +100,7 @@ def new_game():
     Starts a new game instance. Sets player name, board size & number of ships
     based on inputs and prints input values.
     """
+    print("Welcome to Battleships Command!\nTop left corner is row: 0, col: 0")
     # takes input for player name
     while True:
         name = input("Please enter your name: ")
@@ -173,14 +174,14 @@ def generate_boards(name, computer_board, player_board, scores, guesses):
     Prints player and computer boards with updated values.
     """
     # seperate lists function credit in README
-    print(" Computer's Board: ")
+    print("Computer's Board: ")
     print(*computer_board, sep="\n")
     print(f"{name.capitalize()}'s Board: ")
     print(*player_board, sep="\n")
 
     # prints scores on first round then scores and guesses for future rounds
     if len(guesses) > 0:
-        print(f"{scores}You have already guessed:\n{guesses}\n")
+        print(f"{scores}\nYou have already guessed:\n{guesses}\n")
     else:
         print(scores)
 
@@ -264,8 +265,8 @@ def new_round(settings, player_board, computer_board,
     guesses_and_hits and new_guess functions.
     """
     # updates scores
-    p_score = f"{settings.name}'s ships remaining: {settings.player_ships}\n"
-    c_score = f"Computer's ships remaining: {settings.computer_ships}\n"
+    p_score = f"{settings.name}'s ships: {settings.player_ships} - "
+    c_score = f"Computer's ships: {settings.computer_ships}"
     scores = p_score + c_score
 
     # calls game_over if either player has 0 ships remaining

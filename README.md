@@ -1,31 +1,9 @@
-![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
+# Battleships Command
 
-Welcome DDBC23,
+Battleships command is a python terminal game which runs in the Code Institute terminal on Heroku
 
-This is the Code Institute student template for deploying your third portfolio project, the Python command-line project. The last update to this file was: **August 17, 2021**
+Users can compete against the computer by correctly guessing the opponent's battleship coordinates before the computer finds theirs. The player can choose what board size and amount of ships they would like to use each game.
 
-## Reminders
+## How to Play
 
-* Your code must be placed in the `run.py` file
-* Your dependencies must be placed in the `requirements.txt` file
-* Do not edit any of the other files or your code may not deploy properly
-
-## Creating the Heroku app
-
-When you create the app, you will need to add two buildpacks from the _Settings_ tab. The ordering is as follows:
-
-1. `heroku/python`
-2. `heroku/nodejs`
-
-You must then create a _Config Var_ called `PORT`. Set this to `8000`
-
-If you have credentials, such as in the Love Sandwiches project, you must create another _Config Var_ called `CREDS` and paste the JSON into the value field.
-
-Connect your GitHub repository and deploy as normal.
-
-## Constraints
-
-The deployment terminal is set to 80 columns by 24 rows. That means that each line of text needs to be 80 characters or less otherwise it will be wrapped onto a second line.
-
------
-Happy coding!
+Battleship Command is based on the classic 'Battleship' game. You can learn more about it on [Wikipedia](https://en.wikipedia.org/wiki/Battleship_game#:~:text=The%20ships%20cannot%20overlap%20(i.e.,to%20see%20each%20other's%20pieces.)

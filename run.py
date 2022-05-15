@@ -175,8 +175,8 @@ def generate_boards(name, computer_board, player_board, scores, guesses):
     # seperate lists function credit in README
     print(" Computer's Board: ")
     print(*computer_board, sep="\n")
-    print(f"\n {name.capitalize()}'s Board: ")
-    print(*player_board, "\n", sep="\n")
+    print(f"{name.capitalize()}'s Board: ")
+    print(*player_board, sep="\n")
 
     # prints scores on first round then scores and guesses for future rounds
     if len(guesses) > 0:
